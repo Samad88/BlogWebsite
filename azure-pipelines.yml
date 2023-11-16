@@ -1,17 +1,26 @@
-# HTML
-# Archive your static HTML project and save it with the build record.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
-trigger:
-- main
-
-pool:
-  vmImage: ubuntu-latest
+variables:
+  buildConfiguration: 'Release'
 
 steps:
-- task: ArchiveFiles@2
+# No dotnet build is needed for an HTML site
+
+- task: CopyFiles@2
+  displayName: 'Copy HTML files'
   inputs:
-    rootFolderOrFile: '$(build.sourcesDirectory)'
-    includeRootFolder: false
+    SourceFolder: '$(System.DefaultWorkingDirectory)'
+    Contents: '**/*.html'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+
 - task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'html-artifact'
+    publishLocation: 'Container'
+
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'Towards-AzurePortal'
+    appType: 'webAppLinux'
+    appName: 'DevopsDemoWeb'
+    package: '$(Build.ArtifactStagingDirectory)/html-artifact/**/*.html'
