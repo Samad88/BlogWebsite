@@ -1,26 +1,25 @@
-variables:
+  variables:
   buildConfiguration: 'Release'
 
 steps:
-# No dotnet build is needed for an HTML site
+  - task: CopyFiles@2
+    displayName: 'Copy HTML files'
+    inputs:
+      SourceFolder: '$(System.DefaultWorkingDirectory)'
+      Contents: '**/*.html'
+      TargetFolder: '$(Build.ArtifactStagingDirectory)/html-artifact'
 
-- task: CopyFiles@2
-  displayName: 'Copy HTML files'
-  inputs:
-    SourceFolder: '$(System.DefaultWorkingDirectory)'
-    Contents: '**/*.html'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Artifact'
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)/html-artifact'
+      ArtifactName: 'html-artifact'
+      publishLocation: 'Container'
 
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact'
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'html-artifact'
-    publishLocation: 'Container'
+  - task: AzureWebApp@1
+    inputs:
+      azureSubscription: 'Devops_Demo_ServiceConnection'
+      appType: 'webAppLinux'
+      appName: 'DevopsDemoWeb'
+      package: '$(System.DefaultWorkingDirectory)/html-artifact/**/*.html'
 
-- task: AzureWebApp@1
-  inputs:
-    azureSubscription: 'Devops_Demo_ServiceConnection'
-    appType: 'webAppLinux'
-    appName: 'DevopsDemoWeb'
-    package: '$(Build.ArtifactStagingDirectory)/html-artifact/**/*.html'
