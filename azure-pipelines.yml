@@ -20,7 +20,7 @@ steps:
 
 - task: AzureWebApp@1
   inputs:
-    azureSubscription: 'Towards-AzurePortal'
+    azureSubscription: 'Devops_Demo_ServiceConnection'
     appType: 'webAppLinux'
     appName: 'DevopsDemoWeb'
     package: '$(Build.ArtifactStagingDirectory)/html-artifact/**/*.html'
